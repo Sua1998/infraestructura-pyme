@@ -31,6 +31,7 @@ flowchart LR
 | Netdata | Monitorización | 19999 |
 | rsync | Sincronización de backups | 22 |
 
+
 ## Tabla de versiones de software
 
 | Componente | Versión | Función |
@@ -41,6 +42,8 @@ flowchart LR
 | UFW | 0.36 | Firewall básico |
 | Netdata | Última estable | Monitorización |
 | Certbot | 2.9 | SSL/TLS automático |
+=======
+
 
 ## 5. Redes y seguridad
 
