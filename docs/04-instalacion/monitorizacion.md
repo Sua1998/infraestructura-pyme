@@ -80,3 +80,28 @@ sudo chmod +x /usr/local/bin/check_sistema.sh
 | RAM > 90% | Revisar procesos |
 | Apache caído | Reiniciar servicio y revisar logs |
 | MySQL caído | Revisar logs y espacio en disco |
+
+
+
+
+# Monitorización del sistema
+
+## Objetivo
+
+La monitorización permite comprobar el estado del servidor y detectar problemas antes de que afecten al servicio web o a la base de datos.
+
+En esta infraestructura se propone usar **Netdata** como herramienta principal de monitorización, ya que permite ver métricas del sistema en tiempo real mediante una interfaz web sencilla.
+
+## Herramienta seleccionada
+
+| Herramienta | Uso principal | Motivo de elección |
+|---|---|---|
+| Netdata | Monitorización en tiempo real | Fácil instalación, interfaz web y métricas completas |
+| journalctl | Revisión de logs del sistema | Integrado en Linux |
+| systemctl | Estado de servicios | Permite comprobar Apache, MySQL y otros servicios |
+
+## Instalación de Netdata
+
+```bash
+sudo apt update
+sudo apt install netdata -y
