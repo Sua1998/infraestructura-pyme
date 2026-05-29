@@ -32,6 +32,18 @@ flowchart LR
 | rsync | Sincronización de backups | 22 |
 
 
+## Tabla de versiones de software
+
+| Componente | Versión | Función |
+|---|---|---|
+| Apache | 2.4.59 | Servidor web HTTP |
+| PHP | 8.1 | Lenguaje de servidor |
+| MySQL | 8.0 | Base de datos |
+| UFW | 0.36 | Firewall básico |
+| Netdata | Última estable | Monitorización |
+| Certbot | 2.9 | SSL/TLS automático |
+=======
+
 
 ## 5. Redes y seguridad
 
