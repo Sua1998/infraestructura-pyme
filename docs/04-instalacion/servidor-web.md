@@ -107,3 +107,107 @@ sudo systemctl restart haproxy
 - Usar HTTPS mediante Certbot.
 - Revisar logs periódicamente.
 - No exponer directorios sensibles.
+
+
+## Balanceador de carga HAProxy
+
+### Objetivo
+
+El cliente solicita añadir un balanceador de carga HAProxy delante del servidor Apache.
+
+HAProxy recibirá las peticiones HTTP/HTTPS de los usuarios y las reenviará al servidor web Apache correspondiente. Esto permite mejorar la disponibilidad y preparar la infraestructura para crecer en el futuro.
+
+### Instalación propuesta
+
+> Nota: este proyecto solo documenta el proceso. Los comandos no se ejecutan durante la práctica.
+
+```bash
+sudo apt update
+sudo apt install haproxy -y
+```
+
+### Comprobación del servicio
+
+```bash
+sudo systemctl status haproxy
+```
+
+Activar HAProxy en el arranque:
+
+```bash
+sudo systemctl enable haproxy
+```
+
+Iniciar HAProxy:
+
+```bash
+sudo systemctl start haproxy
+```
+
+### Archivo de configuración
+
+El archivo principal de configuración de HAProxy es:
+
+```text
+/etc/haproxy/haproxy.cfg
+```
+
+### Ejemplo básico de configuración
+
+```text
+frontend http_front
+    bind *:80
+    default_backend apache_back
+
+backend apache_back
+    balance roundrobin
+    server web1 192.168.1.10:80 check
+```
+
+### Explicación de la configuración
+
+| Directiva | Función |
+|---|---|
+| `frontend` | Define el punto de entrada del tráfico |
+| `bind *:80` | Escucha peticiones HTTP en el puerto 80 |
+| `default_backend` | Envía el tráfico al grupo de servidores definido |
+| `backend` | Define los servidores Apache de destino |
+| `balance roundrobin` | Reparte las peticiones de forma equilibrada |
+| `check` | Comprueba si el servidor backend responde |
+
+### Validar configuración
+
+Antes de reiniciar HAProxy se debe validar el archivo de configuración:
+
+```bash
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
+```
+
+### Reiniciar HAProxy
+
+```bash
+sudo systemctl restart haproxy
+```
+
+### Reglas de firewall para HAProxy
+
+Permitir tráfico HTTP:
+
+```bash
+sudo ufw allow 80/tcp
+```
+
+Permitir tráfico HTTPS:
+
+```bash
+sudo ufw allow 443/tcp
+```
+
+### Buenas prácticas
+
+- Validar la configuración antes de reiniciar HAProxy.
+- Documentar todos los servidores backend.
+- Revisar logs si aparecen errores de conexión.
+- Usar HTTPS en producción.
+- Monitorizar el estado del servicio.
+- Monitorizar el estado del servicio.

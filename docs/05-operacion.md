@@ -135,3 +135,55 @@ Cuando se detecte una incidencia, se recomienda seguir estos pasos:
 - Usar cuentas con permisos mínimos.
 - No compartir claves privadas SSH.
 - Registrar las incidencias importantes.
+
+
+
+## Operación del balanceador HAProxy
+
+### Objetivo
+
+Esta sección describe las tareas básicas de mantenimiento y revisión del balanceador HAProxy.
+
+### Comprobar estado del servicio
+
+```bash
+sudo systemctl status haproxy
+```
+
+### Validar configuración
+
+Antes de reiniciar HAProxy, validar el archivo de configuración:
+
+```bash
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
+```
+
+### Reiniciar HAProxy
+
+```bash
+sudo systemctl restart haproxy
+```
+
+### Revisar logs de HAProxy
+
+```bash
+journalctl -u haproxy
+```
+
+### Incidencias comunes
+
+| Problema | Posible causa | Solución |
+|---|---|---|
+| HAProxy no inicia | Error en `haproxy.cfg` | Validar configuración con `haproxy -c` |
+| La web no responde | Backend Apache caído | Revisar Apache |
+| Error 503 | No hay servidores backend disponibles | Comprobar servidores configurados |
+| Puerto ocupado | Otro servicio usa el puerto 80 | Revisar servicios activos |
+| Cambios no aplicados | HAProxy no fue reiniciado | Reiniciar servicio |
+
+### Buenas prácticas
+
+- Validar configuración antes de reiniciar.
+- Mantener copia de seguridad de `haproxy.cfg`.
+- Revisar logs después de cada cambio.
+- Documentar cualquier modificación.
+- Comprobar periódicamente los servidores backend.
