@@ -1,77 +1,110 @@
 # Revisión final del proyecto
 
-## 1. Conflictos encontrados
+## Objetivo
 
-### Conflicto 1: `docs/02-diseno.md`
+Este documento recoge la reflexión final sobre el trabajo realizado durante el proyecto de documentación colaborativa de una infraestructura LAMP con monitorización.
 
-Durante la sesión 2, dos ramas modificaron la misma tabla de versiones:
+El proyecto se ha realizado usando Markdown, Git y GitHub, simulando el trabajo colaborativo de un equipo técnico.
 
-- Rama `feature/actualizar-versiones`: cambió Apache a `2.4.60`.
-- Rama `feature/nuevas-tecnologias`: cambió Apache a `2.4.59` y añadió Certbot.
+## Conflictos encontrados
 
-Git no pudo decidir automáticamente qué cambio conservar.
+Durante el proyecto se han provocado conflictos para practicar su resolución con Git.
 
-### Solución
+### Conflicto en `02-diseno.md`
 
-Se resolvió manualmente manteniendo:
+El primer conflicto se produjo en la tabla de versiones de software del archivo `docs/02-diseno.md`.
 
-- Apache `2.4.60`.
-- Certbot `2.9`.
+Una rama modificó la versión de Apache a `2.4.60` y otra rama modificó la misma zona añadiendo Certbot y usando otra versión de Apache.
 
-Commit recomendado:
+La solución final fue mantener la versión `2.4.60` de Apache y añadir Certbot como nueva tecnología:
 
-```bash
-git commit -m "Resuelto conflicto en tabla de versiones. Se integra Apache 2.4.60 y Certbot"
+```markdown
+| Apache | 2.4.60 | Servidor web HTTP actualizado |
+| Certbot | 2.9 | SSL/TLS automático |
 ```
 
-## 2. Conflicto 2: `docs/04-instalacion/ssh-firewall.md`
+### Conflicto o actualización con rebase en `ssh-firewall.md`
 
-Durante la sesión 3, ambos integrantes modificaron la misma sección de reglas UFW.
-
-- Una versión limitaba SSH a la red de oficina.
-- Otra versión añadía políticas por defecto y reglas web.
-
-### Solución
-
-Se resolvió con rebase combinando ambas propuestas:
+En la sesión 3 se practicó el uso de:
 
 ```bash
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-sudo ufw allow from 192.168.1.0/24 to any port 22 proto tcp
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw enable
+git pull --rebase origin main
 ```
 
-## 3. Comandos Git más usados
+En este caso, Git pudo integrar los cambios automáticamente, por lo que no fue necesario resolver marcadores manuales de conflicto.
+
+Aun así, el proceso sirvió para practicar la actualización de una rama de trabajo con los últimos cambios de `main`.
+
+## Comandos Git utilizados
+
+Durante el proyecto se utilizaron los siguientes comandos:
 
 ```bash
-git clone
-git checkout -b
 git status
-git add .
-git commit -m
+git branch
+git checkout
+git checkout -b
+git add
+git commit
 git push
 git pull
 git pull --rebase
-git merge
-git rebase --continue
 git push --force-with-lease
 ```
 
-## 4. Qué haríamos diferente
+## Ramas utilizadas
 
-- Hacer `git pull origin main` antes de crear cada rama.
-- Crear issues más detallados.
-- Escribir commits más pequeños.
-- Revisar enlaces Markdown en cada Pull Request.
-- Acordar previamente qué secciones editará cada persona para evitar conflictos innecesarios.
+Las ramas principales de trabajo fueron:
 
-## 5. Funcionamiento del intercambio de roles
+| Rama | Uso |
+|---|---|
+| `feature/plataforma-base` | Documentación inicial de análisis y diseño |
+| `feature/operaciones` | Monitorización y backups |
+| `feature/actualizar-versiones` | Actualización de versión de Apache |
+| `feature/nuevas-tecnologias` | Añadir Certbot y resolver conflicto |
+| `feature/guia-operacion` | Operación, recuperación y CHANGELOG |
+| `feature/servidor-web-y-bd` | Cambios de SSH y firewall desde plataforma |
+| `feature/balanceador-config` | Documentación de HAProxy desde operaciones |
 
-El intercambio de roles fue útil porque obligó a cada integrante a revisar y mejorar documentos del compañero. Esto ayudó a detectar errores, mejorar la coherencia y entender todo el proyecto, no solo una parte.
+## Pull Requests
 
-## 6. Conclusión
+Se han usado Pull Requests para integrar los cambios en la rama `main`.
 
-El proyecto cumple el objetivo: se ha generado documentación técnica completa en Markdown y se ha practicado trabajo colaborativo real con GitHub, incluyendo Pull Requests, revisiones, merge, rebase, conflictos, issues y release.
+Como el proyecto se ha realizado desde una sola cuenta de GitHub, las revisiones se han simulado mediante comentarios en los Pull Requests.
+
+## Trabajo con Markdown
+
+Los documentos se han redactado usando Markdown con:
+
+- Títulos y subtítulos.
+- Listas ordenadas y desordenadas.
+- Tablas.
+- Bloques de código.
+- Rutas de archivos.
+- Explicaciones técnicas.
+
+## Intercambio de roles
+
+El intercambio de roles permitió que ambos alumnos trabajaran en distintas partes del proyecto.
+
+El Alumno A trabajó principalmente la parte de plataforma, análisis, diseño y seguridad.
+
+El Alumno B trabajó principalmente la parte de operaciones, monitorización, backups, mantenimiento, recuperación y HAProxy.
+
+## Qué se haría diferente
+
+En un proyecto real se podría mejorar:
+
+- Usando dos cuentas reales de GitHub.
+- Activando la protección de `main` con revisión obligatoria.
+- Creando issues para cada tarea.
+- Haciendo commits más pequeños.
+- Revisando los documentos antes de cada merge.
+- Probando todos los enlaces internos del README.
+- Documentando cada incidencia en un apartado específico.
+
+## Conclusión
+
+El proyecto ha permitido practicar documentación técnica con Markdown, control de versiones con Git, uso de ramas, Pull Requests, resolución de conflictos y actualización de ramas mediante rebase.
+
+También ha servido para entender cómo se organiza la documentación profesional de una infraestructura LAMP con monitorización, copias de seguridad, operación y recuperación ante desastres.
