@@ -1,0 +1,79 @@
+# SSH y Firewall UFW
+
+## 1. Objetivo
+
+Documentar una configuración segura de acceso remoto SSH y firewall básico con UFW.
+
+Este archivo se utiliza en la sesión 3 para provocar y resolver un conflicto con rebase.
+
+## 2. Configuración SSH recomendada
+
+Archivo:
+
+```bash
+/etc/ssh/sshd_config
+```
+
+Parámetros recomendados:
+
+```text
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+MaxAuthTries 3
+```
+
+Reinicio documental:
+
+```bash
+sudo systemctl restart ssh
+```
+
+## 3. Reglas UFW resueltas tras conflicto
+
+Durante la sesión 3 se combinan dos versiones: una que limitaba SSH a la red de oficina y otra que definía políticas por defecto.
+
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow from 192.168.1.0/24 to any port 22 proto tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+```
+
+## 4. Explicación de reglas
+
+| Regla | Motivo |
+|---|---|
+| `deny incoming` | Bloquea conexiones entrantes no autorizadas |
+| `allow outgoing` | Permite tráfico saliente normal |
+| `allow from 192.168.1.0/24 to any port 22` | Limita SSH a la red de oficina |
+| `allow 80/tcp` | Permite HTTP |
+| `allow 443/tcp` | Permite HTTPS |
+
+## 5. Comprobación
+
+```bash
+sudo ufw status verbose
+```
+
+Resultado esperado:
+
+```text
+Status: active
+22/tcp ALLOW 192.168.1.0/24
+80/tcp ALLOW Anywhere
+443/tcp ALLOW Anywhere
+```
+
+## 6. Buenas prácticas
+
+- No permitir SSH abierto a todo Internet salvo necesidad.
+- Usar claves SSH.
+- Deshabilitar acceso root.
+- Revisar logs de autenticación:
+
+```bash
+sudo tail -f /var/log/auth.log
+```
