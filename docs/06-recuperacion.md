@@ -1,77 +1,209 @@
-# 06. Plan de recuperación ante desastres
+# Plan de recuperación ante desastres
 
-## 1. Objetivo
+## Objetivo
 
-Definir cómo recuperar la infraestructura ante fallos graves.
+Este documento describe el procedimiento para recuperar la infraestructura en caso de fallo grave, pérdida de datos o caída de servicios.
 
-## 2. Escenarios contemplados
+El objetivo es reducir el tiempo de inactividad y garantizar que la empresa pueda volver a operar lo antes posible.
 
-| Escenario | Impacto | Acción |
+## Escenarios de desastre
+
+| Escenario | Impacto | Prioridad |
 |---|---|---|
-| Caída de Apache | Web no disponible | Reinicio y revisión de logs |
-| Corrupción de base de datos | Pérdida parcial de datos | Restaurar backup SQL |
-| Borrado accidental de web | Web incompleta | Restaurar `/var/www/empresa` |
-| Fallo de configuración | Servicio no inicia | Restaurar configuración anterior |
-| Servidor comprometido | Riesgo alto | Aislar, restaurar y cambiar credenciales |
+| Caída de Apache | La web no está disponible | Alta |
+| Fallo de MySQL/MariaDB | La aplicación no puede acceder a datos | Alta |
+| Pérdida de archivos web | La aplicación queda incompleta | Alta |
+| Eliminación accidental de datos | Pérdida de información | Alta |
+| Fallo de disco | Pérdida parcial o total del sistema | Crítica |
+| Bloqueo por firewall | Pérdida de acceso remoto | Media/Alta |
 
-## 3. Recuperación de Apache
+## Servicios críticos
+
+Los servicios que deben recuperarse primero son:
+
+1. SSH.
+2. Apache.
+3. MySQL/MariaDB.
+4. UFW.
+5. Netdata.
+6. Sistema de backups.
+
+## Orden recomendado de recuperación
+
+1. Comprobar si el servidor responde.
+2. Verificar acceso por SSH.
+3. Revisar estado de servicios críticos.
+4. Consultar logs.
+5. Restaurar archivos web si es necesario.
+6. Restaurar base de datos si es necesario.
+7. Verificar funcionamiento de la aplicación.
+8. Documentar la incidencia.
+
+## Comprobación inicial
+
+Comprobar conectividad:
+
+```bash
+ping IP_DEL_SERVIDOR
+```
+
+Conectarse por SSH:
+
+```bash
+ssh usuario@IP_DEL_SERVIDOR
+```
+
+Comprobar servicios:
+
+```bash
+sudo systemctl status apache2
+sudo systemctl status mysql
+sudo systemctl status ssh
+```
+
+## Recuperación de Apache
+
+Iniciar Apache:
+
+```bash
+sudo systemctl start apache2
+```
+
+Reiniciar Apache:
 
 ```bash
 sudo systemctl restart apache2
+```
+
+Comprobar configuración:
+
+```bash
 sudo apache2ctl configtest
-sudo tail -n 100 /var/log/apache2/error.log
 ```
 
-## 4. Recuperación de base de datos
-
-Restaurar backup:
+Revisar logs:
 
 ```bash
-mysql -u root -p web_empresa < /backup/2026-05-04/mysql/web_empresa.sql
-mysql -u root -p gestion_interna < /backup/2026-05-04/mysql/gestion_interna.sql
+sudo tail -f /var/log/apache2/error.log
 ```
 
-## 5. Recuperación de archivos web
+## Recuperación de MySQL/MariaDB
+
+Comprobar servicio:
 
 ```bash
-rsync -avz /backup/2026-05-04/www/empresa/ /var/www/empresa/
+sudo systemctl status mysql
 ```
 
-Corregir permisos:
+Iniciar servicio:
 
 ```bash
-sudo chown -R www-data:www-data /var/www/empresa
+sudo systemctl start mysql
 ```
 
-## 6. Recuperación de configuración Apache
+Restaurar una base de datos desde backup:
 
 ```bash
-rsync -avz /backup/2026-05-04/config/apache2/ /etc/apache2/
-sudo apache2ctl configtest
-sudo systemctl reload apache2
+mysql -u usuario_backup -p bd_web < /backups/diario/bd_web_2026-05-29.sql
 ```
 
-## 7. Recuperación ante incidente de seguridad
+Comprobar bases de datos disponibles:
 
-1. Desconectar servidor de red si hay compromiso grave.
-2. Revisar logs.
-3. Cambiar contraseñas y claves.
-4. Restaurar desde backup limpio.
-5. Aplicar actualizaciones.
-6. Revisar reglas UFW.
-7. Documentar la incidencia.
+```bash
+mysql -u usuario_backup -p -e "SHOW DATABASES;"
+```
 
-## 8. RTO y RPO
+## Recuperación de archivos web
 
-| Concepto | Valor objetivo |
+Restaurar archivos desde copia local:
+
+```bash
+rsync -av /backups/diario/web/ /var/www/html/
+```
+
+Restaurar archivos desde servidor externo:
+
+```bash
+rsync -av usuario@servidor-backup:/backups/web/ /var/www/html/
+```
+
+Aplicar permisos recomendados:
+
+```bash
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+```
+
+## Recuperación de acceso SSH
+
+Comprobar servicio SSH:
+
+```bash
+sudo systemctl status ssh
+```
+
+Comprobar reglas UFW:
+
+```bash
+sudo ufw status verbose
+```
+
+Permitir acceso SSH desde la red de oficina:
+
+```bash
+sudo ufw allow from 192.168.1.0/24 to any port 22
+```
+
+## Recuperación del firewall
+
+Listar reglas numeradas:
+
+```bash
+sudo ufw status numbered
+```
+
+Eliminar una regla incorrecta:
+
+```bash
+sudo ufw delete NUMERO_REGLA
+```
+
+Permitir tráfico web:
+
+```bash
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+```
+
+## Verificación final
+
+Después de recuperar el servicio, se debe comprobar:
+
+- La web carga correctamente.
+- Apache está activo.
+- MySQL/MariaDB está activo.
+- SSH funciona.
+- El firewall mantiene las reglas necesarias.
+- Netdata muestra métricas.
+- Los backups siguen programados.
+- No hay errores críticos en logs.
+
+## Registro de recuperación
+
+| Campo | Información |
 |---|---|
-| RTO | 4 horas |
-| RPO | 24 horas |
+| Fecha | Día y hora de la incidencia |
+| Servicio afectado | Apache, MySQL, SSH, etc. |
+| Descripción | Qué ha ocurrido |
+| Causa | Motivo detectado |
+| Solución | Acciones realizadas |
+| Responsable | Persona que interviene |
+| Estado final | Resuelto o pendiente |
 
-## 9. Checklist final
+## Buenas prácticas
 
-- [ ] Servicio restaurado.
-- [ ] Logs revisados.
-- [ ] Backup validado.
-- [ ] Contraseñas revisadas.
-- [ ] Documentación actualizada.
+- Probar restauraciones periódicamente.
+- Mantener copias fuera del servidor principal.
+- Documentar todos los cambios.
+- No borrar backups antiguos sin verificar los nuevos.
+- Mantener una copia de la documentación en GitHub.
