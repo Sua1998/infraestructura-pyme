@@ -1,67 +1,47 @@
 # CHANGELOG
 
-Registro de cambios del proyecto.
+Todos los cambios importantes del proyecto se documentan en este archivo.
 
-## [v1.0] - 2026-05-04
-
-### Añadido
-
-- Documentación completa de infraestructura LAMP.
-- Documentación de HAProxy por cambio de alcance.
-- Guía de operación.
-- Plan de recuperación.
-- Reflexión final del proyecto.
-- Release final `v1.0`.
-
-## Sesión 4
+## [0.3.0] - Sesión 3
 
 ### Añadido
 
-- Issue: `Añadir balanceador HAProxy a la infraestructura`.
-- Rama `feature/balanceador-diseno`.
-- Rama `feature/balanceador-config`.
-- Secciones de HAProxy en `02-diseno.md`, `03-planificacion.md`, `servidor-web.md` y `05-operacion.md`.
-- Archivo `REVISION.md`.
+- Guía de operación y mantenimiento.
+- Plan de recuperación ante desastres.
+- Procedimientos de revisión diaria, semanal y mensual.
+- Comandos de comprobación de servicios.
+- Procedimientos básicos de restauración.
+- Registro de incidencias y recuperación.
 
 ### Cambiado
 
-- README actualizado con índice completo.
-- Planificación actualizada con cambio de alcance.
+- Se amplía la documentación de operaciones.
+- Se prepara el proyecto para la resolución del segundo conflicto en `ssh-firewall.md`.
 
-## Sesión 3
+---
 
-### Añadido
-
-- `servidor-web.md`
-- `base-de-datos.md`
-- `ssh-firewall.md`
-- `05-operacion.md`
-- `06-recuperacion.md`
-
-### Cambiado
-
-- Intercambio de roles.
-- Resolución de conflicto en `ssh-firewall.md` mediante rebase.
-
-## Sesión 2
+## [0.2.0] - Sesión 2
 
 ### Añadido
 
 - Revisión cruzada de Pull Requests.
-- Correcciones tras feedback.
-- Conflicto forzado en `02-diseno.md`.
+- Conflicto provocado en `02-diseno.md`.
+- Incorporación de Certbot en la tabla de tecnologías.
 
 ### Corregido
 
-- Conflicto de versiones de Apache.
-- Se conserva Apache `2.4.60`.
-- Se añade Certbot `2.9`.
+- Conflicto en la tabla de versiones de software.
+- Se mantiene Apache `2.4.60` y se añade Certbot.
 
-## Sesión 1
+---
+
+## [0.1.0] - Sesión 1
 
 ### Añadido
 
 - Estructura inicial del repositorio.
 - README inicial.
-- Ramas `feature/plataforma-base` y `feature/operaciones`.
-- Primeros borradores de análisis, diseño, monitorización y backups.
+- Documentación de análisis y diseño.
+- Documentación de monitorización.
+- Documentación de copias de seguridad.
+- Primeras ramas de trabajo: `feature/plataforma-base` y `feature/operaciones`.

@@ -1,86 +1,137 @@
-# 05. Guía de operación y mantenimiento
+# Guía de operación y mantenimiento
 
-## 1. Objetivo
+## Objetivo
 
-Definir tareas de operación diaria, semanal y mensual para mantener la infraestructura documentada.
+Este documento describe las tareas necesarias para mantener en funcionamiento la infraestructura LAMP de la PYME.
 
-## 2. Tareas diarias
+La guía está pensada para el personal técnico encargado de revisar el estado del servidor, comprobar servicios, validar copias de seguridad y actuar ante incidencias básicas.
 
-| Tarea | Comando documental |
-|---|---|
-| Revisar estado de Apache | `systemctl status apache2` |
-| Revisar estado de MySQL | `systemctl status mysql` |
-| Revisar uso de disco | `df -h` |
-| Revisar memoria | `free -h` |
-| Revisar logs de errores web | `tail -n 50 /var/log/apache2/error.log` |
-| Revisar backup nocturno | `tail -n 50 /var/log/backup_pyme.log` |
+## Servicios principales
 
-## 3. Tareas semanales
+| Servicio | Función | Comando de revisión |
+|---|---|---|
+| Apache | Servidor web | `sudo systemctl status apache2` |
+| MySQL/MariaDB | Base de datos | `sudo systemctl status mysql` |
+| SSH | Acceso remoto seguro | `sudo systemctl status ssh` |
+| UFW | Firewall básico | `sudo ufw status verbose` |
+| Netdata | Monitorización | `sudo systemctl status netdata` |
 
-- Revisar actualizaciones disponibles:
+## Tareas diarias
 
-```bash
-sudo apt update
-apt list --upgradable
-```
+| Tarea | Descripción | Responsable |
+|---|---|---|
+| Revisar Apache | Comprobar que el servidor web está activo | Sistemas |
+| Revisar MySQL | Comprobar que la base de datos responde | Sistemas |
+| Revisar espacio en disco | Detectar falta de almacenamiento | Sistemas |
+| Revisar memoria | Comprobar consumo de RAM | Sistemas |
+| Revisar backups | Confirmar que la copia diaria se ha generado | Sistemas |
+| Revisar monitorización | Comprobar alertas o métricas anómalas | Sistemas |
 
-- Comprobar rotación de backups.
-- Revisar accesos SSH sospechosos:
+## Comandos diarios recomendados
 
-```bash
-sudo grep "Failed password" /var/log/auth.log
-```
-
-- Revisar métricas de Netdata.
-
-## 4. Tareas mensuales
-
-- Probar restauración de una copia de seguridad.
-- Revisar usuarios de base de datos.
-- Revisar reglas UFW.
-- Revisar certificados SSL.
-- Actualizar documentación si cambia la infraestructura.
-
-## 5. Operación de HAProxy
-
-Añadido en sesión 4 por cambio de alcance.
-
-Comprobar estado:
+Comprobar Apache:
 
 ```bash
-sudo systemctl status haproxy
-```
-
-Reiniciar tras cambios:
-
-```bash
-sudo systemctl reload haproxy
-```
-
-Consultar logs:
-
-```bash
-sudo journalctl -u haproxy
-```
-
-## 6. Procedimiento ante caída web
-
-1. Comprobar HAProxy.
-2. Comprobar Apache.
-3. Revisar logs.
-4. Comprobar espacio en disco.
-5. Reiniciar servicio si procede.
-6. Registrar incidencia en `REVISION.md` o issue.
-
-```bash
-sudo systemctl status haproxy
 sudo systemctl status apache2
-sudo systemctl restart apache2
 ```
 
-## 7. Buenas prácticas
+Comprobar MySQL:
 
-- No hacer cambios directamente en producción sin documentar.
-- Crear issue antes de cambios relevantes.
-- Mantener `CHANGELOG.md` actualizado.
-- Usar Pull Request para cambios en documentación.
+```bash
+sudo systemctl status mysql
+```
+
+Comprobar espacio en disco:
+
+```bash
+df -h
+```
+
+Comprobar memoria:
+
+```bash
+free -h
+```
+
+Comprobar procesos activos:
+
+```bash
+top
+```
+
+Comprobar firewall:
+
+```bash
+sudo ufw status verbose
+```
+
+## Tareas semanales
+
+- Revisar logs de Apache.
+- Revisar logs de MySQL.
+- Comprobar intentos de acceso SSH.
+- Revisar el tamaño de los backups.
+- Comprobar actualizaciones pendientes.
+- Verificar que Netdata sigue activo.
+- Revisar que no existan archivos temporales innecesarios.
+
+## Tareas mensuales
+
+- Realizar una prueba de restauración de backup.
+- Revisar usuarios con acceso SSH.
+- Revisar reglas del firewall.
+- Comprobar versiones de Apache, PHP y MySQL.
+- Actualizar la documentación si cambia la infraestructura.
+- Revisar el plan de recuperación ante desastres.
+
+## Revisión de logs
+
+Logs de Apache:
+
+```bash
+sudo tail -f /var/log/apache2/access.log
+sudo tail -f /var/log/apache2/error.log
+```
+
+Logs del sistema:
+
+```bash
+journalctl -xe
+```
+
+Logs de autenticación:
+
+```bash
+sudo tail -f /var/log/auth.log
+```
+
+## Gestión de incidencias
+
+Cuando se detecte una incidencia, se recomienda seguir estos pasos:
+
+1. Identificar el servicio afectado.
+2. Comprobar el estado con `systemctl`.
+3. Revisar los logs relacionados.
+4. Comprobar recursos del sistema.
+5. Aplicar una solución temporal si es necesario.
+6. Documentar la incidencia.
+7. Revisar si hay que actualizar la documentación.
+
+## Incidencias comunes
+
+| Problema | Posible causa | Acción recomendada |
+|---|---|---|
+| La web no carga | Apache detenido | Reiniciar Apache |
+| Error de base de datos | MySQL detenido | Revisar servicio MySQL |
+| No hay espacio en disco | Logs o backups acumulados | Limpiar archivos antiguos |
+| No se puede acceder por SSH | Firewall o SSH mal configurado | Revisar UFW y servicio SSH |
+| Netdata no carga | Servicio detenido o puerto bloqueado | Revisar Netdata y firewall |
+
+## Buenas prácticas
+
+- No realizar cambios sin documentarlos.
+- Mantener copias de seguridad actualizadas.
+- Revisar servicios críticos después de cada cambio.
+- Usar cuentas con permisos mínimos.
+- No compartir claves privadas SSH.
+- Registrar las incidencias importantes.
