@@ -91,3 +91,16 @@ El proyecto se considera válido si:
 - Se usa merge y rebase.
 - Existe un release `v1.0`.
 - Existe reflexión final en `REVISION.md`.
+
+
+
+## Revisión de sesión 1
+
+Este documento se trabaja desde la rama `feature/plataforma-base`.
+
+Cambios realizados:
+
+- Se revisan los requisitos principales del cliente.
+- Se define el alcance del proyecto.
+- Se aclara que no se crearán máquinas virtuales reales.
+- Se identifican requisitos funcionales y no funcionales.

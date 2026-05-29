@@ -80,3 +80,20 @@ El diseño es adecuado para una PYME porque:
 - Facilita recuperación mediante backups.
 - Incluye monitorización básica.
 - Puede evolucionar con balanceo de carga.
+
+
+## Revisión de diseño inicial
+
+Este diseño inicial define los componentes principales de la infraestructura LAMP.
+
+Elementos incluidos:
+
+- Servidor web Apache.
+- PHP.
+- Base de datos MySQL/MariaDB.
+- SSH para administración.
+- UFW como firewall.
+- Monitorización.
+- Backups.
+
+Esta sección forma parte del trabajo inicial de la rama `feature/plataforma-base`.
