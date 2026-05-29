@@ -29,17 +29,19 @@ Reinicio documental:
 sudo systemctl restart ssh
 ```
 
-## 3. Reglas UFW resueltas tras conflicto
+## Configuración de firewall con UFW
 
-Durante la sesión 3 se combinan dos versiones: una que limitaba SSH a la red de oficina y otra que definía políticas por defecto.
+Se propone usar UFW para definir una política básica de seguridad en el servidor.
 
 ```bash
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-sudo ufw allow from 192.168.1.0/24 to any port 22 proto tcp
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
+sudo ufw allow 22/tcp
+sudo ufw allow 80,443/tcp
 sudo ufw enable
+```
+
+Estas reglas permiten la administración por SSH y el tráfico web HTTP/HTTPS.
 ```
 
 ## 4. Explicación de reglas
