@@ -1,82 +1,130 @@
 # Copias de seguridad
 
-## 1. Objetivo
+## Objetivo
 
-Documentar una estrategia de copias de seguridad automáticas para bases de datos y archivos relevantes.
+Las copias de seguridad permiten recuperar la información en caso de pérdida de datos, error humano, fallo del servidor o ataque.
 
-## 2. Elementos a respaldar
+En esta infraestructura se propone una estrategia basada en:
 
-| Elemento | Ruta o comando |
-|---|---|
-| Web | `/var/www/empresa` |
-| Configuración Apache | `/etc/apache2` |
-| Base de datos web | `web_empresa` |
-| Base de datos interna | `gestion_interna` |
-| Configuración UFW/SSH | `/etc/ssh`, reglas documentadas |
+- Copias de seguridad de bases de datos con `mysqldump`.
+- Copias de archivos web con `rsync`.
+- Rotación de copias antiguas.
+- Almacenamiento en una ubicación externa o servidor secundario.
 
-## 3. Backup de bases de datos
+## Elementos que se deben copiar
 
-```bash
-mysqldump -u root -p web_empresa > /backup/mysql/web_empresa_$(date +%F).sql
-mysqldump -u root -p gestion_interna > /backup/mysql/gestion_interna_$(date +%F).sql
+| Elemento | Ruta o recurso | Motivo |
+|---|---|---|
+| Archivos web | `/var/www/html` | Contiene la aplicación web |
+| Configuración de Apache | `/etc/apache2` | Permite recuperar la configuración del servidor web |
+| Bases de datos | MySQL/MariaDB | Contienen datos de la web y gestión interna |
+| Scripts de mantenimiento | `/opt/scripts` | Automatizan tareas importantes |
+| Documentación | Repositorio GitHub | Contiene la documentación técnica del proyecto |
+
+## Estructura propuesta de backups
+
+Se propone guardar las copias en:
+
+```text
+/backups/
+├── diario/
+├── semanal/
+└── mensual/
 ```
 
-## 4. Backup de archivos con rsync
+## Copia de seguridad de la base de datos
+
+Ejemplo de copia de una base de datos:
 
 ```bash
-rsync -avz /var/www/empresa/ /backup/www/empresa/
-rsync -avz /etc/apache2/ /backup/config/apache2/
+mysqldump -u usuario_backup -p nombre_base_datos > /backups/diario/bd_web.sql
 ```
 
-## 5. Script documental de backup
+Ejemplo con fecha automática:
+
+```bash
+mysqldump -u usuario_backup -p bd_web > /backups/diario/bd_web_$(date +%F).sql
+```
+
+## Copia de seguridad de archivos web
+
+Ejemplo usando `rsync`:
+
+```bash
+rsync -av /var/www/html/ /backups/diario/web/
+```
+
+Copia hacia un servidor externo:
+
+```bash
+rsync -av /var/www/html/ usuario@servidor-backup:/backups/web/
+```
+
+## Script básico de backup
+
+Ejemplo de script documentado:
 
 ```bash
 #!/bin/bash
 
 FECHA=$(date +%F)
-DESTINO="/backup/$FECHA"
+DESTINO="/backups/diario"
 
-mkdir -p "$DESTINO/mysql"
-mkdir -p "$DESTINO/www"
-mkdir -p "$DESTINO/config"
+mkdir -p "$DESTINO"
 
-mysqldump -u root -p web_empresa > "$DESTINO/mysql/web_empresa.sql"
-mysqldump -u root -p gestion_interna > "$DESTINO/mysql/gestion_interna.sql"
+mysqldump -u usuario_backup -p bd_web > "$DESTINO/bd_web_$FECHA.sql"
+rsync -av /var/www/html/ "$DESTINO/web_$FECHA/"
 
-rsync -avz /var/www/empresa/ "$DESTINO/www/empresa/"
-rsync -avz /etc/apache2/ "$DESTINO/config/apache2/"
+echo "Backup completado: $FECHA"
 ```
 
-## 6. Programación con cron
+El script podría guardarse como:
+
+```text
+/opt/scripts/backup_diario.sh
+```
+
+## Programación con cron
+
+Para ejecutar el backup todos los días a las 02:00:
 
 ```bash
-0 2 * * * /usr/local/bin/backup_pyme.sh >> /var/log/backup_pyme.log 2>&1
+0 2 * * * /opt/scripts/backup_diario.sh
 ```
 
-## 7. Rotación
+## Política de rotación
 
-Mantener:
+| Tipo de copia | Frecuencia | Conservación |
+|---|---|---|
+| Diaria | Todos los días | 7 días |
+| Semanal | Cada domingo | 4 semanas |
+| Mensual | Primer día del mes | 6 meses |
 
-| Tipo | Retención |
-|---|---|
-| Diarios | 7 días |
-| Semanales | 4 semanas |
-| Mensuales | 6 meses |
+## Comprobación de backups
 
-Ejemplo:
+No basta con crear backups. También hay que comprobar que se pueden restaurar.
+
+Acciones recomendadas:
+
+- Verificar que los archivos se crean correctamente.
+- Comprobar el tamaño de los backups.
+- Revisar logs de ejecución.
+- Hacer pruebas de restauración periódicas.
+- Guardar una copia fuera del servidor principal.
+
+## Restauración básica de base de datos
+
+Ejemplo de restauración:
 
 ```bash
-find /backup -type d -mtime +30 -exec rm -rf {} \;
+mysql -u usuario_backup -p bd_web < /backups/diario/bd_web_2026-05-29.sql
 ```
 
-## 8. Comprobación de backups
+## Buenas prácticas
 
-Una copia no se considera válida hasta que se ha probado su restauración.
-
-Checklist:
-
-- [ ] Existe archivo SQL.
-- [ ] El archivo no está vacío.
-- [ ] Se puede restaurar en entorno de prueba.
-- [ ] Los archivos web están completos.
-- [ ] El log de backup no muestra errores.
+- Automatizar las copias de seguridad.
+- No guardar todas las copias en el mismo servidor.
+- Proteger los backups con permisos adecuados.
+- Cifrar copias sensibles si se almacenan fuera.
+- Revisar periódicamente que las copias funcionan.
+- Documentar fecha, responsable y resultado de cada prueba de restauración.
