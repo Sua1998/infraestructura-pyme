@@ -31,20 +31,7 @@ flowchart LR
 | Netdata | Monitorización | 19999 |
 | rsync | Sincronización de backups | 22 |
 
-## 4. Tabla de versiones
 
-Esta tabla se usa para provocar el conflicto de la sesión 2.
-
-| Software | Versión documentada | Uso |
-|---|---:|---|
-| Ubuntu Server | 22.04 LTS | Sistema base |
-| Apache | 2.4.60 | Servidor web, versión resuelta tras conflicto |
-| PHP | 8.1 | Lenguaje de servidor |
-| MySQL | 8.0 | Base de datos |
-| Certbot | 2.9 | SSL/TLS automático añadido tras conflicto |
-| HAProxy | 2.8 | Balanceador añadido en sesión 4 |
-| Netdata | Última estable | Monitorización |
-| UFW | Incluido en Ubuntu | Firewall |
 
 ## 5. Redes y seguridad
 
